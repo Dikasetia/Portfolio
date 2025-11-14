@@ -123,6 +123,15 @@
             </video>
         </div>
 
+        <!-- SLIDE 3 - REPLACE video3.mp4 with your file -->
+        <!--
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="video3.mp4" type="video/mp4">
+            </video>
+        </div>
+        -->
+
         <!-- ADD MORE SLIDES - Copy this block and change video4.mp4, video5.mp4, etc -->
         <!--
         <div class="slide">
@@ -159,14 +168,14 @@
 
         function showSlide(index) {
             slides.forEach((slide, i) => {
-                slide.classList.remove('active');
                 const video = slide.querySelector('video');
                 if (i === index) {
                     slide.classList.add('active');
-                    video.play(); // Ensure video plays when slide becomes active
+                    video.play().catch(e => console.log('Play prevented:', e));
                 } else {
+                    slide.classList.remove('active');
                     video.pause();
-                    video.currentTime = 0; // Reset video to start
+                    video.currentTime = 0;
                 }
             });
 
