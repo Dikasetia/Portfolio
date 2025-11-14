@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitch Deck</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .deck-container {
+            width: 100%;
+            height: 100vh;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .slide video {
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+        }
+
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 1000;
+        }
+
+        button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            color: white;
+            font-size: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .instructions {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body>
+    <div class="deck-container">
+        <!-- SLIDE 1 - REPLACE video1.mp4 with your file -->
+        <div class="slide active">
+            <video autoplay loop muted playsinline>
+                <source src="video1.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- SLIDE 2 - REPLACE video2.mp4 with your file -->
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="video2.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- SLIDE 3 - REPLACE video3.mp4 with your file -->
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="video3.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- ADD MORE SLIDES - Copy this block and change video4.mp4, video5.mp4, etc -->
+        <!--
+        <div class="slide">
+            <video autoplay loop muted playsinline>
+                <source src="video4.mp4" type="video/mp4">
+            </video>
+        </div>
+        -->
+    </div>
+
+    <div class="instructions">
+        Use arrow keys or buttons to navigate
+    </div>
+
+    <div class="slide-counter">
+        <span id="current">1</span> / <span id="total">3</span>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn">← Previous</button>
+        <button id="nextBtn">Next →</button>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const currentCounter = document.getElementById('current');
+        const totalCounter = document.getElementById('total');
+
+        totalCounter.textContent = totalSlides;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                slide.classList.remove('active');
+                const video = slide.querySelector('video');
+                if (i === index) {
+                    slide.classList.add('active');
+                    video.play(); // Ensure video plays when slide becomes active
+                } else {
+                    video.pause();
+                    video.currentTime = 0; // Reset video to start
+                }
+            });
+
+            currentSlide = index;
+            currentCounter.textContent = currentSlide + 1;
+
+            // Update button states
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+        }
+
+        function nextSlide() {
+            if (currentSlide < totalSlides - 1) {
+                showSlide(currentSlide + 1);
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                showSlide(currentSlide - 1);
+            }
+        }
+
+        // Button controls
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Keyboard controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                e.preventDefault();
+                prevSlide();
+            }
+        });
+
+        // Click to advance (click on right side of screen)
+        document.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON' && e.clientX > window.innerWidth / 2) {
+                nextSlide();
+            } else if (e.target.tagName !== 'BUTTON' && e.clientX <= window.innerWidth / 2) {
+                prevSlide();
+            }
+        });
+
+        // Initialize
+        showSlide(0);
+        prevBtn.disabled = true;
+    </script>
+</body>
+</html>
