@@ -34,13 +34,13 @@
             align-items: center;
             justify-content: center;
             opacity: 0;
+            visibility: hidden;
             transition: opacity 0.5s ease;
-            pointer-events: none;
         }
 
         .slide.active {
             opacity: 1;
-            pointer-events: auto;
+            visibility: visible;
         }
 
         .slide video {
@@ -109,47 +109,28 @@
 </head>
 <body>
     <div class="deck-container">
-        <!-- SLIDE 1 - REPLACE video1.mp4 with your file -->
-        <div class="slide active">
+        
+        <!-- ADD YOUR SLIDES HERE - Just copy/paste this block for each new slide -->
+        
+        <div class="slide">
             <video autoplay loop muted playsinline>
                 <source src="slide1.mp4" type="video/mp4">
             </video>
         </div>
 
-        <!-- SLIDE 2 - REPLACE video2.mp4 with your file -->
         <div class="slide">
             <video autoplay loop muted playsinline>
                 <source src="slide2.mp4" type="video/mp4">
             </video>
         </div>
 
-        <!-- SLIDE 3 - REPLACE video3.mp4 with your file -->
-        <!--
-        <div class="slide">
-            <video autoplay loop muted playsinline>
-                <source src="video3.mp4" type="video/mp4">
-            </video>
-        </div>
-        -->
-
-        <!-- ADD MORE SLIDES - Copy this block and change video4.mp4, video5.mp4, etc -->
-        <!--
-        <div class="slide">
-            <video autoplay loop muted playsinline>
-                <source src="video4.mp4" type="video/mp4">
-            </video>
-        </div>
-        -->
+        <!-- Add more slides by copying the block above -->
+        
     </div>
 
-    <div class="instructions">
-        Use arrow keys or buttons to navigate
-    </div>
-
-    <div class="slide-counter">
-        <span id="current">1</span> / <span id="total">3</span>
-    </div>
-
+    <div class="instructions">Use arrow keys or buttons to navigate</div>
+    <div class="slide-counter"><span id="current">1</span> / <span id="total">0</span></div>
+    
     <div class="controls">
         <button id="prevBtn">← Previous</button>
         <button id="nextBtn">Next →</button>
@@ -158,74 +139,67 @@
     <script>
         let currentSlide = 0;
         const slides = document.querySelectorAll('.slide');
-        const totalSlides = slides.length;
+        const total = slides.length;
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const currentCounter = document.getElementById('current');
         const totalCounter = document.getElementById('total');
 
-        totalCounter.textContent = totalSlides;
+        totalCounter.textContent = total;
 
-        function showSlide(index) {
+        function updateSlide(index) {
             slides.forEach((slide, i) => {
                 const video = slide.querySelector('video');
+                
                 if (i === index) {
                     slide.classList.add('active');
-                    video.play().catch(e => console.log('Play prevented:', e));
+                    if (video) {
+                        video.play().catch(e => console.log('Video play error:', e));
+                    }
                 } else {
                     slide.classList.remove('active');
-                    video.pause();
-                    video.currentTime = 0;
+                    if (video) {
+                        video.pause();
+                        video.currentTime = 0;
+                    }
                 }
             });
 
             currentSlide = index;
             currentCounter.textContent = currentSlide + 1;
-
-            // Update button states
             prevBtn.disabled = currentSlide === 0;
-            nextBtn.disabled = currentSlide === totalSlides - 1;
+            nextBtn.disabled = currentSlide === total - 1;
         }
 
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                showSlide(currentSlide + 1);
-            }
+        function next() {
+            if (currentSlide < total - 1) updateSlide(currentSlide + 1);
         }
 
-        function prevSlide() {
-            if (currentSlide > 0) {
-                showSlide(currentSlide - 1);
-            }
+        function prev() {
+            if (currentSlide > 0) updateSlide(currentSlide - 1);
         }
 
-        // Button controls
-        nextBtn.addEventListener('click', nextSlide);
-        prevBtn.addEventListener('click', prevSlide);
+        nextBtn.addEventListener('click', next);
+        prevBtn.addEventListener('click', prev);
 
-        // Keyboard controls
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowRight' || e.key === ' ') {
                 e.preventDefault();
-                nextSlide();
+                next();
             } else if (e.key === 'ArrowLeft') {
                 e.preventDefault();
-                prevSlide();
+                prev();
             }
         });
 
-        // Click to advance (click on right side of screen)
         document.addEventListener('click', (e) => {
-            if (e.target.tagName !== 'BUTTON' && e.clientX > window.innerWidth / 2) {
-                nextSlide();
-            } else if (e.target.tagName !== 'BUTTON' && e.clientX <= window.innerWidth / 2) {
-                prevSlide();
-            }
+            if (e.target.tagName === 'BUTTON') return;
+            e.clientX > window.innerWidth / 2 ? next() : prev();
         });
 
-        // Initialize
-        showSlide(0);
-        prevBtn.disabled = true;
+        window.addEventListener('load', () => {
+            updateSlide(0);
+        });
     </script>
 </body>
 </html>
